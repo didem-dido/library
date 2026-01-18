@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "library",
+  "orientation": "any",
+  "scope": "/library/",
+  "short_name": "library",
+  "start_url": "/library/",
+  "theme_color": "#9333ea",
+  "lang": "en"
+}
