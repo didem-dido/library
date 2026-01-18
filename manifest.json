@@ -2,11 +2,10 @@
   "background_color": "#ffffff",
   "dir": "ltr",
   "display": "standalone",
-  "name": "library",
+  "name": "didem-dido.github",
   "orientation": "any",
-  "scope": "/library/",
-  "short_name": "library",
-  "start_url": "/library/",
-  "theme_color": "#9333ea",
-  "lang": "en"
+  "scope": "/",
+  "short_name": "didem-dido.github",
+  "start_url": "/",
+  "theme_color": "#9333ea"
 }
