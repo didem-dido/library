@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#9333ea">
+    <title>My Library</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); min-height: 100vh; padding-bottom: 80px; overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
+        input, textarea, select { -webkit-user-select: text; user-select: text; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 12px; }
+        .header { background: white; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 16px; margin-bottom: 12px; }
+        .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .logo { display: flex; align-items: center; gap: 8px; }
+        .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        h1 { font-size: 24px; font-weight: bold; color: #1f2937; }
+        .btn-add { display: flex; align-items: center; gap: 8px; background: #9333ea; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-add:active { transform: scale(0.95); }
+        .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        @media (min-width: 768px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+        .stat-card { padding: 12px; border-radius: 8px; border: 1px solid; }
+        .stat-card.blue { background: #dbeafe; border-color: #bfdbfe; }
+        .stat-card.yellow { background: #fef3c7; border-color: #fde68a; }
+        .stat-card.green { background: #d1fae5; border-color: #a7f3d0; }
+        .stat-card.purple { background: #f3e8ff; border-color: #e9d5ff; }
+        .stat-label { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+        .stat-card.blue .stat-label { color: #1e40af; }
+        .stat-card.yellow .stat-label { color: #92400e; }
+        .stat-card.green .stat-label { color: #065f46; }
+        .stat-card.purple .stat-label { color: #6b21a8; }
+        .stat-value { font-size: 20px; font-weight: bold; color: #1f2937; }
+        .main-tabs { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; background: white; padding: 12px; border-radius: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .main-tabs::-webkit-scrollbar { display: none; }
+        .main-tab { padding: 10px 20px; border-radius: 8px; font-weight: 500; white-space: nowrap; border: none; cursor: pointer; transition: all 0.2s; background: #f3f4f6; color: #6b7280; }
+        .main-tab.active { background: #9333ea; color: white; box-shadow: 0 2px 4px rgba(147, 51, 234, 0.3); }
+        .tabs { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab { padding: 10px 20px; border-radius: 8px; font-weight: 500; white-space: nowrap; border: none; cursor: pointer; transition: all 0.2s; background: white; color: #6b7280; }
+        .tab.active { background: #9333ea; color: white; box-shadow: 0 2px 4px rgba(147, 51, 234, 0.3); }
+        .books-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        @media (min-width: 768px) { .books-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1024px) { .books-grid { grid-template-columns: repeat(4, 1fr); } }
+        .book-card { background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; transition: transform 0.2s; }
+        .book-card:active { transform: scale(0.98); }
+        .book-cover { position: relative; padding-top: 150%; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%); cursor: pointer; }
+        .book-cover img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .book-cover-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; }
+        .badge-notes { position: absolute; top: 8px; left: 8px; background: #9333ea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .btn-delete { position: absolute; top: 8px; right: 8px; background: #ef4444; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: all 0.2s; font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+        .btn-delete:active { transform: scale(0.9); }
+        .book-info { padding: 12px; }
+        .book-title { font-weight: bold; font-size: 14px; color: #1f2937; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .book-author { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+        .progress-section { margin-bottom: 8px; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+        .progress-bar { width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #9333ea 0%, #3b82f6 100%); transition: width 0.3s; }
+        .progress-input { width: 100%; margin-top: 8px; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; }
+        .book-actions { display: flex; gap: 4px; }
+        .select-status { flex: 1; padding: 6px 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; background: white; }
+        .btn-edit { padding: 6px 12px; background: #f3f4f6; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
+        .btn-edit:active { transform: scale(0.95); }
+        .empty-state { text-align: center; padding: 48px 0; background: white; border-radius: 12px; }
+        .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-text { color: #6b7280; font-size: 14px; }
+        
+        /* Reading Tracker Styles */
+        .tracker-container { display: none; }
+        .tracker-container.active { display: block; }
+        .tracker-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .tracker-stat { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+        .tracker-stat-value { font-size: 28px; font-weight: bold; background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px; }
+        .tracker-stat-label { font-size: 12px; color: #6b7280; font-weight: 500; }
+        .calendar-container { background: white; padding: 16px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .calendar-month { font-size: 18px; font-weight: bold; color: #1f2937; }
+        .calendar-nav { display: flex; gap: 8px; }
+        .calendar-nav button { background: #f3f4f6; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6b7280; transition: all 0.2s; }
+        .calendar-nav button:active { transform: scale(0.9); background: #e5e7eb; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .calendar-day-header { text-align: center; font-size: 12px; font-weight: 600; color: #6b7280; padding: 8px 0; }
+        .calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; font-size: 14px; position: relative; cursor: pointer; transition: all 0.2s; background: #f9fafb; }
+        .calendar-day.other-month { opacity: 0.3; }
+        .calendar-day.today { background: #fef3c7; border: 2px solid #fbbf24; }
+        .calendar-day.has-reading { background: linear-gradient(135deg, #a78bfa 0%, #818cf8 100%); color: white; font-weight: bold; }
+        .calendar-day.has-reading.completed-book { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .calendar-day:active { transform: scale(0.95); }
+        .calendar-day-number { font-size: 14px; margin-bottom: 2px; }
+        .calendar-day-indicator { font-size: 10px; }
+        .reading-log-modal { background: white; padding: 20px; border-radius: 12px; max-width: 400px; }
+        .reading-log-title { font-size: 18px; font-weight: bold; margin-bottom: 16px; color: #1f2937; }
+        .reading-log-date { font-size: 14px; color: #6b7280; margin-bottom: 16px; }
+        .reading-log-form { display: flex; flex-direction: column; gap: 12px; }
+        .reading-log-books { margin-bottom: 12px; }
+        .reading-log-book { display: flex; align-items: center; gap: 8px; padding: 8px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px; }
+        .reading-log-book-check { width: 20px; height: 20px; }
+        .reading-log-book-name { flex: 1; font-size: 14px; }
+        .btn-save-log { background: #9333ea; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-save-log:active { transform: scale(0.98); }
+        
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; padding: 16px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 16px; padding: 20px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .modal-title { font-size: 20px; font-weight: bold; color: #1f2937; }
+        .btn-close { background: none; border: none; color: #6b7280; cursor: pointer; padding: 4px; font-size: 28px; line-height: 1; }
+        .form-group { margin-bottom: 12px; }
+        .divider { position: relative; margin: 16px 0; text-align: center; }
+        .divider-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #d1d5db; }
+        .divider-text { position: relative; display: inline-block; background: white; padding: 0 8px; font-size: 12px; color: #6b7280; }
+        .form-input, .form-textarea, .form-select { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: #9333ea; box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1); }
+        .form-textarea { resize: vertical; font-family: inherit; }
+        .cover-preview { display: none; margin-bottom: 12px; text-align: center; }
+        .cover-preview.show { display: block; }
+        .cover-preview img { max-height: 160px; max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .upload-box { padding: 20px; border: 2px dashed #d8b4fe; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); }
+        .upload-box:hover { border-color: #9333ea; background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); }
+        .upload-box:active { transform: scale(0.98); }
+        .upload-icon { color: #9333ea; margin: 0 auto 12px; display: block; }
+        .upload-title { font-size: 14px; font-weight: 600; color: #7c3aed; margin-bottom: 4px; }
+        .upload-subtitle { font-size: 12px; color: #6b7280; }
+        .loading-indicator { display: none; margin-top: 12px; text-align: center; }
+        .loading-indicator.show { display: block; }
+        .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #e5e7eb; border-top-color: #9333ea; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 12px; color: #6b7280; margin-top: 8px; }
+        .btn-primary { width: 100%; background: #9333ea; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-primary:active { transform: scale(0.98); }
+        .fab { position: fixed; bottom: 24px; right: 16px; width: 56px; height: 56px; background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%); color: white; border: none; border-radius: 50%; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4); cursor: pointer; z-index: 40; transition: all 0.2s; }
+        .fab:active { transform: scale(0.9); }
+        .fab svg { width: 24px; height: 24px; }
+        .hidden { display: none !important; }
+        .details-section { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb; }
+        .details-section:last-child { border-bottom: none; }
+        .details-label { font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .details-value { font-size: 14px; color: #1f2937; line-height: 1.5; }
+        .voice-controls { display: flex; gap: 8px; margin-top: 8px; }
+        .btn-voice { flex: 1; padding: 8px 12px; border: 2px solid #9333ea; background: white; color: #9333ea; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-voice:active { transform: scale(0.95); }
+        .btn-voice.recording { background: #ef4444; border-color: #ef4444; color: white; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .voice-status { font-size: 11px; color: #6b7280; text-align: center; margin-top: 4px; min-height: 16px; }
+        .textarea-wrapper { position: relative; }
+        .section { display: none; }
+        .section.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <div class="logo">
+                    <div class="logo-icon">📚</div>
+                    <h1>My Library</h1>
+                </div>
+                <button class="btn-add" onclick="openModal()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Add</span>
+                </button>
+            </div>
+            <div class="stats" id="stats"></div>
+        </div>
+        
+        <div class="main-tabs">
+            <button class="main-tab active" onclick="switchSection('library')">📚 Library</button>
+            <button class="main-tab" onclick="switchSection('tracker')">📅 Reading Tracker</button>
+        </div>
+        
+        <!-- Library Section -->
+        <div id="library-section" class="section active">
+            <div class="tabs">
+                <button class="tab active" id="tab-reading" onclick="changeTab('reading')">Reading</button>
+                <button class="tab" id="tab-toRead" onclick="changeTab('toRead')">To Read</button>
+                <button class="tab" id="tab-read" onclick="changeTab('read')">Read</button>
+                <button class="tab" id="tab-dnf" onclick="changeTab('dnf')">DNF</button>
+            </div>
+            <div class="books-grid" id="booksGrid"></div>
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-icon">📖</div>
+                <p class="empty-text">No books in this category yet</p>
+            </div>
+        </div>
+        
+        <!-- Reading Tracker Section -->
+        <div id="tracker-section" class="section">
+            <div class="tracker-stats">
+                <div class="tracker-stat">
+                    <div class="tracker-stat-value" id="currentStreak">0</div>
+                    <div class="tracker-stat-label">Current Streak</div>
+                </div>
+                <div class="tracker-stat">
+                    <div class="tracker-stat-value" id="longestStreak">0</div>
+                    <div class="tracker-stat-label">Longest Streak</div>
+                </div>
+                <div class="tracker-stat">
+                    <div class="tracker-stat-value" id="completedBooks">0</div>
+                    <div class="tracker-stat-label">Books Read</div>
+                </div>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-month" id="calendarMonth"></div>
+                    <div class="calendar-nav">
+                        <button onclick="changeMonth(-1)">◀</button>
+                        <button onclick="changeMonth(1)">▶</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="fab" onclick="openModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+    </button>
+    
+    <!-- Reading Log Modal -->
+    <div class="modal" id="readingLogModal" onclick="if(event.target===this)closeReadingLog()">
+        <div class="modal-content reading-log-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Reading Log</h2>
+                <button class="btn-close" onclick="closeReadingLog()">×</button>
+            </div>
+            <div class="reading-log-date" id="logDate"></div>
+            <div class="reading-log-books" id="logBooks"></div>
+            <button class="btn-save-log" onclick="saveReadingLog()">Save Reading Log</button>
+        </div>
+    </div>
+    
+    <!-- Book Modal -->
+    <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">New Book</h2>
+                <button class="btn-close" onclick="closeModal()">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="upload-box">
+                    <input type="file" accept=".epub" onchange="handleEpub(event)" class="hidden">
+                    <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="32" height="32">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                    </svg>
+                    <div class="upload-title">Upload EPUB File</div>
+                    <div class="upload-subtitle">Auto-fill book information</div>
+                </label>
+                <div class="loading-indicator" id="epubLoading">
+                    <div class="spinner"></div>
+                    <p class="loading-text">Processing EPUB...</p>
+                </div>
+            </div>
+            
+            <div class="divider"><div class="divider-line"></div><span class="divider-text">book information</span></div>
+            
+            <div class="form-group"><input type="text" class="form-input" id="bookTitle" placeholder="Book Title *"></div>
+            <div class="form-group"><input type="text" class="form-input" id="bookAuthor" placeholder="Author *"></div>
+            <div class="form-group"><input type="number" class="form-input" id="bookPages" placeholder="Total Pages" min="0"></div>
+            <div class="form-group"><input type="text" class="form-input" id="bookPublisher" placeholder="Publisher"></div>
+            <div class="form-group"><input type="text" class="form-input" id="bookLanguage" placeholder="Language"></div>
+            <div class="form-group">
+                <select class="form-select" id="bookStatus">
+                    <option value="reading">Reading</option>
+                    <option value="toRead">To Read</option>
+                    <option value="read">Read</option>
+                    <option value="dnf">DNF</option>
+                </select>
+            </div>
+            
+            <div class="cover-preview" id="coverPreview"><img id="bookCover" alt="Book cover"></div>
+            <div class="form-group"><input type="file" accept="image/*" onchange="handleImage(event)" class="form-input" style="padding:8px;"></div>
+            
+            <div class="form-group"><textarea class="form-textarea" id="bookSummary" rows="4" placeholder="Book summary/description..."></textarea></div>
+            
+            <div class="divider"><div class="divider-line"></div><span class="divider-text">my notes</span></div>
+            
+            <div class="form-group"><textarea class="form-textarea" id="bookLiked" rows="2" placeholder="What I liked..."></textarea></div>
+            <div class="form-group"><textarea class="form-textarea" id="bookDisliked" rows="2" placeholder="What I didn't like..."></textarea></div>
+            <div class="form-group"><textarea class="form-textarea" id="bookWhyAbandoned" rows="2" placeholder="Why I stopped reading..."></textarea></div>
+            <div class="form-group"><input type="text" class="form-input" id="bookFavChar" placeholder="Favorite character"></div>
+            <div class="form-group"><input type="text" class="form-input" id="bookDislikedChar" placeholder="Least favorite character"></div>
+            <div class="form-group">
+                <div class="textarea-wrapper">
+                    <textarea class="form-textarea" id="bookNotes" rows="3" placeholder="Other notes..."></textarea>
+                    <div class="voice-controls">
+                        <button class="btn-voice" onclick="startVoiceNote('bookNotes')"><span>🎤</span><span>Voice</span></button>
+                        <button class="btn-voice" onclick="clearField('bookNotes')"><span>🗑️</span><span>Clear</span></button>
+                    </div>
+                    <div class="voice-status" id="status-bookNotes"></div>
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="saveBook()">Save Book</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="detailsModal" onclick="if(event.target===this)closeDetailsModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Book Details</h2>
+                <button class="btn-close" onclick="closeDetailsModal()">×</button>
+            </div>
+            <div id="detailsContent"></div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        let books = [];
+        let readingLogs = {};
+        let activeTab = 'reading';
+        let currentCoverUrl = '';
+        let editingBookId = null;
+        let recognition = null;
+        let isRecording = false;
+        let currentRecordingField = null;
+        let currentCalendarDate = new Date();
+        let selectedLogDate = null;
+        
+        const DB_NAME = 'MyLibraryDB';
+        const DB_VERSION = 2;
+        const BOOKS_STORE = 'books';
+        const LOGS_STORE = 'readingLogs';
+        let db;
+
+        // Initialize Database
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains(BOOKS_STORE)) {
+                        database.createObjectStore(BOOKS_STORE, { keyPath: 'id' });
+                    }
+                    if (!database.objectStoreNames.contains(LOGS_STORE)) {
+                        database.createObjectStore(LOGS_STORE, { keyPath: 'date' });
+                    }
+                };
+            });
+        }
+
+        // Load books from IndexedDB
+        async function loadBooks() {
+            try {
+                if (!db) await initDB();
+                
+                const transaction = db.transaction([BOOKS_STORE], 'readonly');
+                const store = transaction.objectStore(BOOKS_STORE);
+                const request = store.getAll();
+                
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => {
+                        books = request.result || [];
+                        renderAll();
+                        resolve();
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            } catch (error) {
+                console.error('Load error:', error);
+                books = [];
+                renderAll();
+            }
+        }
+
+        // Save books to IndexedDB
+        async function saveBooks() {
+            try {
+                if (!db) await initDB();
+                
+                const transaction = db.transaction([BOOKS_STORE], 'readwrite');
+                const store = transaction.objectStore(BOOKS_STORE);
+                
+                for (const book of books) {
+                    await store.put(book);
+                }
+                
+                return new Promise((resolve, reject) => {
+                    transaction.oncomplete = () => resolve();
+                    transaction.onerror = () => reject(transaction.error);
+                });
+            } catch (error) {
+                console.error('Save error:', error);
+                alert('⚠️ Could not save your books. Please try again.');
+            }
+        }
+
+        // Load reading logs
+        async function loadReadingLogs() {
+            try {
+                if (!db) await initDB();
+                
+                const transaction = db.transaction([LOGS_STORE], 'readonly');
+                const store = transaction.objectStore(LOGS_STORE);
+                const request = store.getAll();
+                
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => {
+                        const logs = request.result || [];
+                        readingLogs = {};
+                        logs.forEach(log => {
+                            readingLogs[log.date] = log;
+                        });
+                        updateTrackerStats();
+                        renderCalendar();
+                        resolve();
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            } catch (error) {
+                console.error('Load logs error:', error);
+                readingLogs = {};
+            }
+        }
+
+        // Save reading log
+        async function saveReadingLogToDB(logData) {
+            try {
+                if (!db) await initDB();
+                
+                const transaction = db.transaction([LOGS_STORE], 'readwrite');
+                const store = transaction.objectStore(LOGS_STORE);
+                await store.put(logData);
+                
+                return new Promise((resolve, reject) => {
+                    transaction.oncomplete = () => resolve();
+                    transaction.onerror = () => reject(transaction.error);
+                });
+            } catch (error) {
+                console.error('Save log error:', error);
+            }
+        }
+
+        // Switch between sections
+        function switchSection(section) {
+            document.querySelectorAll('.main-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            
+            if (section === 'library') {
+                document.querySelector('.main-tab:first-child').classList.add('active');
+                document.getElementById('library-section').classList.add('active');
+            } else if (section === 'tracker') {
+                document.querySelector('.main-tab:last-child').classList.add('active');
+                document.getElementById('tracker-section').classList.add('active');
+                renderCalendar();
+                updateTrackerStats();
+            }
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('calendarMonth').textContent = `${monthNames[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = firstDay.getDay();
+            const daysInMonth = lastDay.getDate();
+            
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            // Day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+            
+            // Previous month days
+            const prevMonthDays = new Date(year, month, 0).getDate();
+            for (let i = startDay - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.innerHTML = `<div class="calendar-day-number">${prevMonthDays - i}</div>`;
+                grid.appendChild(day);
+            }
+            
+            // Current month days
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const log = readingLogs[dateStr];
+                
+                const isToday = today.getDate() === i && 
+                               today.getMonth() === month && 
+                               today.getFullYear() === year;
+                
+                if (isToday) {
+                    day.classList.add('today');
+                }
+                
+                if (log && log.booksRead && log.booksRead.length > 0) {
+                    day.classList.add('has-reading');
+                    if (log.completedBooks > 0) {
+                        day.classList.add('completed-book');
+                    }
+                    day.innerHTML = `
+                        <div class="calendar-day-number">${i}</div>
+                        <div class="calendar-day-indicator">${log.booksRead.length}📚${log.completedBooks > 0 ? '✓' : ''}</div>
+                    `;
+                } else {
+                    day.innerHTML = `<div class="calendar-day-number">${i}</div>`;
+                }
+                
+                day.onclick = () => openReadingLog(dateStr);
+                grid.appendChild(day);
+            }
+            
+            // Next month days
+            const remainingDays = 42 - (startDay + daysInMonth);
+            for (let i = 1; i <= remainingDays; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.innerHTML = `<div class="calendar-day-number">${i}</div>`;
+                grid.appendChild(day);
+            }
+        }
+
+        // Change month
+        function changeMonth(delta) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        // Open reading log modal
+        function openReadingLog(dateStr) {
+            selectedLogDate = dateStr;
+            const date = new Date(dateStr + 'T00:00:00');
+            document.getElementById('logDate').textContent = date.toLocaleDateString('en-US', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            
+            const log = readingLogs[dateStr] || { booksRead: [], completedBooks: 0 };
+            const readingBooks = books.filter(b => b.status === 'reading' || b.status === 'read');
+            
+            const booksHtml = readingBooks.map(book => {
+                const isChecked = log.booksRead.includes(book.id);
+                return `
+                    <div class="reading-log-book">
+                        <input type="checkbox" class="reading-log-book-check" 
+                               id="log-${book.id}" 
+                               ${isChecked ? 'checked' : ''}>
+                        <label for="log-${book.id}" class="reading-log-book-name">${escapeHtml(book.title)}</label>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('logBooks').innerHTML = booksHtml || '<p style="color:#6b7280;">No books available for logging</p>';
+            document.getElementById('readingLogModal').classList.add('show');
+        }
+
+        // Close reading log
+        function closeReadingLog() {
+            document.getElementById('readingLogModal').classList.remove('show');
+            selectedLogDate = null;
+        }
+
+        // Save reading log
+        async function saveReadingLog() {
+            if (!selectedLogDate) return;
+            
+            const checkboxes = document.querySelectorAll('.reading-log-book-check:checked');
+            const booksRead = Array.from(checkboxes).map(cb => cb.id.replace('log-', ''));
+            
+            // Check how many books were completed on this day
+            const completedBooks = books.filter(b => {
+                if (!booksRead.includes(b.id)) return false;
+                if (b.status !== 'read') return false;
+                
+                // Check if book was completed on this date (simplified logic)
+                const logDate = new Date(selectedLogDate);
+                const bookDate = b.completedDate ? new Date(b.completedDate) : null;
+                
+                if (!bookDate) return false;
+                return logDate.toDateString() === bookDate.toDateString();
+            }).length;
+            
+            const logData = {
+                date: selectedLogDate,
+                booksRead,
+                completedBooks
+            };
+            
+            readingLogs[selectedLogDate] = logData;
+            await saveReadingLogToDB(logData);
+            
+            closeReadingLog();
+            renderCalendar();
+            updateTrackerStats();
+        }
+
+        // Update tracker statistics
+        function updateTrackerStats() {
+            // Calculate current streak
+            let currentStreak = 0;
+            let longestStreak = 0;
+            let tempStreak = 0;
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Sort dates
+            const sortedDates = Object.keys(readingLogs)
+                .filter(date => readingLogs[date].booksRead.length > 0)
+                .sort((a, b) => new Date(b) - new Date(a));
+            
+            // Calculate current streak
+            for (let i = 0; i < sortedDates.length; i++) {
+                const logDate = new Date(sortedDates[i]);
+                logDate.setHours(0, 0, 0, 0);
+                
+                const diffDays = Math.floor((today - logDate) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === i) {
+                    currentStreak++;
+                } else {
+                    break;
+                }
+            }
+            
+            // Calculate longest streak
+            if (sortedDates.length > 0) {
+                tempStreak = 1;
+                longestStreak = 1;
+                
+                for (let i = 0; i < sortedDates.length - 1; i++) {
+                    const currentDate = new Date(sortedDates[i]);
+                    const nextDate = new Date(sortedDates[i + 1]);
+                    
+                    const diffDays = Math.floor((currentDate - nextDate) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays === 1) {
+                        tempStreak++;
+                        longestStreak = Math.max(longestStreak, tempStreak);
+                    } else {
+                        tempStreak = 1;
+                    }
+                }
+            }
+            
+            // Count completed books
+            const completedCount = books.filter(b => b.status === 'read').length;
+            
+            document.getElementById('currentStreak').textContent = currentStreak;
+            document.getElementById('longestStreak').textContent = longestStreak;
+            document.getElementById('completedBooks').textContent = completedCount;
+        }
+
+        // Render all
+        function renderAll() {
+            renderStats();
+            renderBooks();
+        }
+
+        // Render statistics
+        function renderStats() {
+            const stats = {
+                reading: books.filter(b => b.status === 'reading').length,
+                toRead: books.filter(b => b.status === 'toRead').length,
+                read: books.filter(b => b.status === 'read').length,
+                totalPages: books.filter(b => b.status === 'read').reduce((sum, b) => sum + (parseInt(b.totalPages) || 0), 0)
+            };
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card blue">
+                    <div class="stat-label">Reading</div>
+                    <div class="stat-value">${stats.reading}</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-label">To Read</div>
+                    <div class="stat-value">${stats.toRead}</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">Read</div>
+                    <div class="stat-value">${stats.read}</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-label">Total Pages</div>
+                    <div class="stat-value">${stats.totalPages}</div>
+                </div>
+            `;
+        }
+
+        // Render books
+        function renderBooks() {
+            const filteredBooks = books.filter(b => b.status === activeTab);
+            const grid = document.getElementById('booksGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredBooks.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            
+            grid.innerHTML = filteredBooks.map(book => {
+                const progress = book.totalPages ? Math.round(((book.currentPage || 0) / book.totalPages) * 100) : 0;
+                const hasNotes = book.liked || book.disliked || book.whyAbandoned || book.favChar || book.dislikedChar || book.notes;
+                
+                return `
+                    <div class="book-card">
+                        <div class="book-cover" onclick="showDetails('${book.id}')">
+                            ${book.coverUrl 
+                                ? `<img src="${book.coverUrl}" alt="${escapeHtml(book.title)}">` 
+                                : '<div class="book-cover-placeholder">📖</div>'}
+                            ${hasNotes ? '<div class="badge-notes">📝</div>' : ''}
+                            <button class="btn-delete" onclick="event.stopPropagation();deleteBook('${book.id}')">×</button>
+                        </div>
+                        <div class="book-info">
+                            <div class="book-title">${escapeHtml(book.title)}</div>
+                            <div class="book-author">${escapeHtml(book.author)}</div>
+                            ${book.totalPages ? `
+                                <div class="progress-section">
+                                    <div class="progress-info">
+                                        <span>Progress</span>
+                                        <span>${progress}%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width:${progress}%"></div>
+                                    </div>
+                                    <input type="number" class="progress-input" 
+                                           placeholder="Current page" 
+                                           value="${book.currentPage || ''}" 
+                                           min="0" 
+                                           max="${book.totalPages}" 
+                                           onchange="updateProgress('${book.id}',this.value)">
+                                </div>
+                            ` : ''}
+                            <div class="book-actions">
+                                <select class="select-status" onchange="updateBookStatus('${book.id}',this.value)">
+                                    <option value="reading" ${book.status === 'reading' ? 'selected' : ''}>Reading</option>
+                                    <option value="toRead" ${book.status === 'toRead' ? 'selected' : ''}>To Read</option>
+                                    <option value="read" ${book.status === 'read' ? 'selected' : ''}>Read</option>
+                                    <option value="dnf" ${book.status === 'dnf' ? 'selected' : ''}>DNF</option>
+                                </select>
+                                <button class="btn-edit" onclick="editBook('${book.id}')">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Change tab
+        function changeTab(tab) {
+            activeTab = tab;
+            
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            
+            renderBooks();
+        }
+
+        // Open modal
+        function openModal() {
+            editingBookId = null;
+            document.getElementById('modalTitle').textContent = 'New Book';
+            resetForm();
+            document.getElementById('modal').classList.add('show');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+            resetForm();
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('bookTitle').value = '';
+            document.getElementById('bookAuthor').value = '';
+            document.getElementById('bookPages').value = '';
+            document.getElementById('bookPublisher').value = '';
+            document.getElementById('bookLanguage').value = '';
+            document.getElementById('bookStatus').value = 'reading';
+            document.getElementById('bookSummary').value = '';
+            document.getElementById('bookLiked').value = '';
+            document.getElementById('bookDisliked').value = '';
+            document.getElementById('bookWhyAbandoned').value = '';
+            document.getElementById('bookFavChar').value = '';
+            document.getElementById('bookDislikedChar').value = '';
+            document.getElementById('bookNotes').value = '';
+            document.getElementById('coverPreview').classList.remove('show');
+            document.getElementById('bookCover').src = '';
+            currentCoverUrl = '';
+            editingBookId = null;
+        }
+
+        // Save book
+        async function saveBook() {
+            const title = document.getElementById('bookTitle').value.trim();
+            const author = document.getElementById('bookAuthor').value.trim();
+            
+            if (!title || !author) {
+                alert('Please enter book title and author');
+                return;
+            }
+            
+            const newStatus = document.getElementById('bookStatus').value;
+            const oldBook = editingBookId ? books.find(b => b.id === editingBookId) : null;
+            
+            const bookData = {
+                id: editingBookId || Date.now().toString(),
+                title,
+                author,
+                totalPages: document.getElementById('bookPages').value,
+                publisher: document.getElementById('bookPublisher').value,
+                language: document.getElementById('bookLanguage').value,
+                status: newStatus,
+                summary: document.getElementById('bookSummary').value,
+                liked: document.getElementById('bookLiked').value,
+                disliked: document.getElementById('bookDisliked').value,
+                whyAbandoned: document.getElementById('bookWhyAbandoned').value,
+                favChar: document.getElementById('bookFavChar').value,
+                dislikedChar: document.getElementById('bookDislikedChar').value,
+                notes: document.getElementById('bookNotes').value,
+                coverUrl: currentCoverUrl,
+                currentPage: 0
+            };
+            
+            // Set completion date if status changed to 'read'
+            if (newStatus === 'read' && (!oldBook || oldBook.status !== 'read')) {
+                bookData.completedDate = new Date().toISOString().split('T')[0];
+            } else if (oldBook && oldBook.completedDate) {
+                bookData.completedDate = oldBook.completedDate;
+            }
+            
+            if (editingBookId) {
+                const index = books.findIndex(b => b.id === editingBookId);
+                if (index !== -1) {
+                    bookData.currentPage = books[index].currentPage || 0;
+                    books[index] = bookData;
+                }
+            } else {
+                books.push(bookData);
+            }
+            
+            await saveBooks();
+            renderAll();
+            updateTrackerStats();
+            closeModal();
+        }
+
+        // Edit book
+        function editBook(id) {
+            const book = books.find(b => b.id === id);
+            if (!book) return;
+            
+            editingBookId = id;
+            document.getElementById('modalTitle').textContent = 'Edit Book';
+            
+            document.getElementById('bookTitle').value = book.title || '';
+            document.getElementById('bookAuthor').value = book.author || '';
+            document.getElementById('bookPages').value = book.totalPages || '';
+            document.getElementById('bookPublisher').value = book.publisher || '';
+            document.getElementById('bookLanguage').value = book.language || '';
+            document.getElementById('bookStatus').value = book.status || 'reading';
+            document.getElementById('bookSummary').value = book.summary || '';
+            document.getElementById('bookLiked').value = book.liked || '';
+            document.getElementById('bookDisliked').value = book.disliked || '';
+            document.getElementById('bookWhyAbandoned').value = book.whyAbandoned || '';
+            document.getElementById('bookFavChar').value = book.favChar || '';
+            document.getElementById('bookDislikedChar').value = book.dislikedChar || '';
+            document.getElementById('bookNotes').value = book.notes || '';
+            
+            if (book.coverUrl) {
+                currentCoverUrl = book.coverUrl;
+                document.getElementById('bookCover').src = book.coverUrl;
+                document.getElementById('coverPreview').classList.add('show');
+            }
+            
+            document.getElementById('modal').classList.add('show');
+        }
+
+        // Delete book
+        async function deleteBook(id) {
+            if (!confirm('Are you sure you want to delete this book?')) return;
+            
+            books = books.filter(b => b.id !== id);
+            await saveBooks();
+            renderAll();
+            updateTrackerStats();
+        }
+
+        // Update progress
+        async function updateProgress(id, currentPage) {
+            const book = books.find(b => b.id === id);
+            if (!book) return;
+            
+            book.currentPage = parseInt(currentPage) || 0;
+            await saveBooks();
+            renderBooks();
+        }
+
+        // Update book status
+        async function updateBookStatus(id, newStatus) {
+            const book = books.find(b => b.id === id);
+            if (!book) return;
+            
+            const oldStatus = book.status;
+            book.status = newStatus;
+            
+            // Set completion date if status changed to 'read'
+            if (newStatus === 'read' && oldStatus !== 'read') {
+                book.completedDate = new Date().toISOString().split('T')[0];
+            }
+            
+            await saveBooks();
+            renderAll();
+            updateTrackerStats();
+        }
+
+        // Show details
+        function showDetails(id) {
+            const book = books.find(b => b.id === id);
+            if (!book) return;
+            
+            const content = document.getElementById('detailsContent');
+            const progress = book.totalPages ? Math.round(((book.currentPage || 0) / book.totalPages) * 100) : 0;
+            
+            let html = `
+                ${book.coverUrl ? `
+                    <div style="text-align:center;margin-bottom:20px;">
+                        <img src="${book.coverUrl}" alt="${escapeHtml(book.title)}" 
+                             style="max-height:200px;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+                    </div>
+                ` : ''}
+                
+                <div class="details-section">
+                    <div class="details-label">Title</div>
+                    <div class="details-value">${escapeHtml(book.title)}</div>
+                </div>
+                
+                <div class="details-section">
+                    <div class="details-label">Author</div>
+                    <div class="details-value">${escapeHtml(book.author)}</div>
+                </div>
+            `;
+            
+            if (book.publisher) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">Publisher</div>
+                        <div class="details-value">${escapeHtml(book.publisher)}</div>
+                    </div>
+                `;
+            }
+            
+            if (book.language) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">Language</div>
+                        <div class="details-value">${escapeHtml(book.language)}</div>
+                    </div>
+                `;
+            }
+            
+            if (book.totalPages) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">Progress</div>
+                        <div class="details-value">${book.currentPage || 0} / ${book.totalPages} pages (${progress}%)</div>
+                    </div>
+                `;
+            }
+            
+            if (book.summary) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">Summary</div>
+                        <div class="details-value">${escapeHtml(book.summary)}</div>
+                    </div>
+                `;
+            }
+            
+            if (book.liked) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">What I Liked</div>
+                        <div class="details-value">${escapeHtml(book.liked)}</div>
+                    </div>
+                `;
+            }
+            
+            if (book.disliked) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">What I Didn't Like</div>
+                        <div class="details-value">${escapeHtml(book.disliked)}</div>
+                    </div>
+                `;
+            }
+            
+            if (book.whyAbandoned) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">Why I Stopped Reading</div>
+                        <div class="details-value">${escapeHtml(book.whyAbandoned)}</div>
+                    </div>
+                `;
+            }
+            
+            if (book.favChar) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">Favorite Character</div>
+                        <div class="details-value">${escapeHtml(book.favChar)}</div>
+                    </div>
+                `;
+            }
+            
+            if (book.dislikedChar) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">Least Favorite Character</div>
+                        <div class="details-value">${escapeHtml(book.dislikedChar)}</div>
+                    </div>
+                `;
+            }
+            
+            if (book.notes) {
+                html += `
+                    <div class="details-section">
+                        <div class="details-label">Other Notes</div>
+                        <div class="details-value">${escapeHtml(book.notes)}</div>
+                    </div>
+                `;
+            }
+            
+            content.innerHTML = html;
+            document.getElementById('detailsModal').classList.add('show');
+        }
+
+        // Close details modal
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        // Handle image upload
+        function handleImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentCoverUrl = e.target.result;
+                document.getElementById('bookCover').src = currentCoverUrl;
+                document.getElementById('coverPreview').classList.add('show');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle EPUB upload
+        async function handleEpub(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('epubLoading').classList.add('show');
+            
+            try {
+                const zip = await JSZip.loadAsync(file);
+                const opfFile = await findOPFFile(zip);
+                
+                if (opfFile) {
+                    const opfContent = await zip.file(opfFile).async('string');
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(opfContent, 'text/xml');
+                    
+                    const title = xml.querySelector('title')?.textContent || '';
+                    const author = xml.querySelector('creator')?.textContent || '';
+                    const publisher = xml.querySelector('publisher')?.textContent || '';
+                    const language = xml.querySelector('language')?.textContent || '';
+                    const description = xml.querySelector('description')?.textContent || '';
+                    
+                    document.getElementById('bookTitle').value = title;
+                    document.getElementById('bookAuthor').value = author;
+                    document.getElementById('bookPublisher').value = publisher;
+                    document.getElementById('bookLanguage').value = language;
+                    document.getElementById('bookSummary').value = description;
+                    
+                    // Try to extract cover
+                    const coverId = xml.querySelector('meta[name="cover"]')?.getAttribute('content');
+                    if (coverId) {
+                        const coverItem = xml.querySelector(`item[id="${coverId}"]`);
+                        if (coverItem) {
+                            const coverPath = coverItem.getAttribute('href');
+                            const basePath = opfFile.substring(0, opfFile.lastIndexOf('/') + 1);
+                            const fullCoverPath = basePath + coverPath;
+                            
+                            const coverFile = zip.file(fullCoverPath);
+                            if (coverFile) {
+                                const coverBlob = await coverFile.async('blob');
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    currentCoverUrl = e.target.result;
+                                    document.getElementById('bookCover').src = currentCoverUrl;
+                                    document.getElementById('coverPreview').classList.add('show');
+                                };
+                                reader.readAsDataURL(coverBlob);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('EPUB parsing error:', error);
+                alert('Could not extract book information from EPUB file');
+            } finally {
+                document.getElementById('epubLoading').classList.remove('show');
+            }
+        }
+
+        // Find OPF file in EPUB
+        async function findOPFFile(zip) {
+            const containerFile = zip.file('META-INF/container.xml');
+            if (containerFile) {
+                const content = await containerFile.async('string');
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(content, 'text/xml');
+                const rootfile = xml.querySelector('rootfile');
+                if (rootfile) {
+                    return rootfile.getAttribute('full-path');
+                }
+            }
+            return null;
+        }
+
+        // Voice recognition
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                console.warn('Speech recognition not supported');
+                return false;
+            }
+            
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = () => {
+                isRecording = true;
+                updateVoiceButton(currentRecordingField, true);
+                updateStatus(currentRecordingField, 'Listening...');
+            };
+            
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                if (currentRecordingField) {
+                    const field = document.getElementById(currentRecordingField);
+                    if (finalTranscript) {
+                        field.value = (field.value + ' ' + finalTranscript).trim();
+                    }
+                    updateStatus(currentRecordingField, interimTranscript || 'Listening...');
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                let message = 'Error occurred';
+                
+                switch(event.error) {
+                    case 'no-speech':
+                        message = 'No speech detected';
+                        break;
+                    case 'audio-capture':
+                        message = 'No microphone found';
+                        break;
+                    case 'not-allowed':
+                        message = 'Microphone permission denied';
+                        break;
+                    default:
+                        message = 'Recognition error: ' + event.error;
+                }
+                
+                updateStatus(currentRecordingField, message);
+                stopVoiceNote();
+            };
+            
+            recognition.onend = () => {
+                isRecording = false;
+                updateVoiceButton(currentRecordingField, false);
+                setTimeout(() => updateStatus(currentRecordingField, ''), 2000);
+            };
+            
+            return true;
+        }
+
+        // Start voice note
+        function startVoiceNote(fieldId) {
+            if (!recognition && !initSpeechRecognition()) {
+                alert('Voice recognition is not supported on this device/browser.');
+                return;
+            }
+            
+            if (isRecording) {
+                stopVoiceNote();
+                return;
+            }
+            
+            currentRecordingField = fieldId;
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Failed to start recognition:', error);
+                updateStatus(currentRecordingField, 'Failed to start recording');
+            }
+        }
+
+        // Stop voice note
+        function stopVoiceNote() {
+            if (recognition && isRecording) {
+                recognition.stop();
+            }
+        }
+
+        // Update voice button
+        function updateVoiceButton(fieldId, recording) {
+            if (!fieldId) return;
+            
+            const statusEl = document.getElementById('status-' + fieldId);
+            if (!statusEl) return;
+            
+            const wrapper = statusEl.closest('.textarea-wrapper');
+            if (!wrapper) return;
+            
+            const btn = wrapper.querySelector('.btn-voice');
+            if (!btn) return;
+            
+            if (recording) {
+                btn.classList.add('recording');
+                btn.innerHTML = '<span>⏹️</span><span>Stop</span>';
+            } else {
+                btn.classList.remove('recording');
+                btn.innerHTML = '<span>🎤</span><span>Voice</span>';
+            }
+        }
+
+        // Update status
+        function updateStatus(fieldId, message) {
+            const statusEl = document.getElementById('status-' + fieldId);
+            if (statusEl) {
+                statusEl.textContent = message;
+            }
+        }
+
+        // Clear field
+        function clearField(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field && confirm('Are you sure you want to clear this field?')) {
+                field.value = '';
+            }
+        }
+
+        // Initialize app
+        window.addEventListener('DOMContentLoaded', async () => {
+            await initDB();
+            await loadBooks();
+            await loadReadingLogs();
+        });
+    </script>
+</body>
+</html>
